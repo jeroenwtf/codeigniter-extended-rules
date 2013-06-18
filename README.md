@@ -2,7 +2,7 @@
 
 A set of useful form validation rules, focused on file uploading (and some more). English corrections and other languages are welcome.
 
-Written by Joseba Juaniz and Jeroen van Meerendonk.
+Written by Joseba Juaniz ([@Patroklo](http://twitter.com/Patroklo)) and Jeroen van Meerendonk ([@jeroen_bz](http://twitter.com/jeroen_bz)).
 Original code written by **devbro** (devbro@devbro.com).
 
 
