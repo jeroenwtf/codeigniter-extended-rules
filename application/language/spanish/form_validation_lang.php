@@ -10,6 +10,7 @@ $lang['file_image_mindim']		= "El archivo del campo %s es demasiada pequeño.";
 $lang['file_image_exactdim']	= "El archivo del campo %s no tiene las dimensiones adecuadas.";
 $lang['is_exactly']				= "El campo %s contiene un valor no válido.";
 $lang['is_not']					= "El campo %s contiene un valor no válido.";
+$lang['valid_hour']				= "El campo %s ha de contener una hora válida (formato 24h)."
 
 
 /* End of file form_validation_lang.php */

@@ -42,6 +42,8 @@
  * 
  * Change Log
  * ---------------------------------------------------------------------------------------------
+ * 3.1:
+ *  Added 'valid_hour'
  * 3.0:
  * 	Working with CI 2.1.
  * 	Separated the error messages from the library
@@ -682,6 +684,27 @@ class MY_Form_validation extends CI_Form_validation {
 		else
 		{
 			return TRUE;
+		}
+	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if the field's value is a valid 24 hour
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	bool
+	 */
+	function valid_hour($hour)
+	{
+		if (preg_match("/(2[0-3]|[01][0-9]):[0-5][0-9]/", $hour))
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
 		}
 	}
 	

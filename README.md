@@ -36,6 +36,9 @@ Use them as the other rules.
 
 ## Change Log
 
+### 3.1
+* Add `valid_hour`rule.
+
 ### 3.0
 * Upgraded and working with CodeIgniter 2.1.
 * Separated the error messages from the library and move them to `/application/language`

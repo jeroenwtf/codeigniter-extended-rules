@@ -10,6 +10,7 @@ $lang['file_image_mindim']		= "The dimensions of the file uploaded in %s are too
 $lang['file_image_exactdim']	= "The file uploaded in %s don't have the right dimensions.";
 $lang['is_exactly']				= "The field %s contains a non valid value.";
 $lang['is_not']					= "The field %s contains a non valid value.";
+$lang['valid_hour']				= "The field %s must be a valid hour (24 format)."
 
 
 /* End of file form_validation_lang.php */
