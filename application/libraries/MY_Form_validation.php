@@ -29,6 +29,7 @@
  * file_image_exactdim[x,y]		Returns FALSE if the image is not the given dimension.
  * is_exactly[list]				Check if the field's value is in the list (separated by comas).
  * is_not[list]					Check if the field's value is not permitted (separated by comas).
+ * valid_hour[hour]				Check if the field's value is a valid 24 hour.
  * 
  * 
  * Info
