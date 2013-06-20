@@ -103,21 +103,21 @@ class MY_Form_validation extends CI_Form_validation {
 		switch ($error_code)
 		{
 			case UPLOAD_ERR_INI_SIZE:
-				return 'El archivo supera la directiva upload_max_filesize de php.ini';
+				return $this->CI->lang->line('error_max_filesize_phpini');
 			case UPLOAD_ERR_FORM_SIZE:
-				return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form';
+				return $this->CI->lang->line('error_max_filesize_form');
 			case UPLOAD_ERR_PARTIAL:
-				return 'El archivo solo ha sido subido parcialmente.';
+				return $this->CI->lang->line('error_partial_upload');
 			case UPLOAD_ERR_NO_FILE:
-				return 'No se ha subido ningún archivo.';
+				return $this->CI->lang->line('error_partial_upload');
 			case UPLOAD_ERR_NO_TMP_DIR:
-				return 'Error de carpeta temporal.';
+				return $this->CI->lang->line('error_temp_dir');
 			case UPLOAD_ERR_CANT_WRITE:
-				return 'Error de escritura de archivo en disco.';
+				return $this->CI->lang->line('error_disk_write');
 			case UPLOAD_ERR_EXTENSION:
-				return 'Subida de archivo detenida por extensión.';
+				return $this->CI->lang->line('error_stopped');
 			default:
-				return 'Error de subida inesperado. Error: '.$error_code;
+				return $this->CI->lang->line('error_unexpected').$error_code;
 		}
 	}	 
 	
@@ -381,6 +381,7 @@ class MY_Form_validation extends CI_Form_validation {
 	 */
 	function file_allowed_type($file,$type)
 	{
+
 		//is type of format a,b,c,d? -> convert to array
 		$exts = explode(',', $type);
 				
@@ -404,17 +405,47 @@ class MY_Form_validation extends CI_Form_validation {
 		$ext_groups['php_code']			= array('php', 'php4', 'php5', 'inc', 'phtml');
 		$ext_groups['word_document']	= array('rtf', 'doc', 'docx');
 		$ext_groups['compressed']		= array('zip', 'gzip', 'tar', 'gz');
+		$ext_groups['document']			= array('txt', 'text', 'doc', 'docx', 'dot', 'dotx', 'word', 'rtf', 'rtx');
 		
+		//if there is a group type in the $type var and not a ext alone, we get it
 		if (array_key_exists($exts[0], $ext_groups))
 		{
 			$exts	= $ext_groups[$exts[0]];
 		}
 		
-		//get file ext
-		$file_ext	= strtolower(strrchr($file['name'], '.'));
-		$file_ext	= substr($file_ext,1);
+		$exts_types = array_flip($exts);
+		$intersection = array_intersect_key($this->CI->output->mimes, $exts_types);
 		
-		if ( ! in_array($file_ext, $exts))
+		//if we can use the finfo function to check the mime AND the mime
+		//exists in the mime file of codeigniter...
+		if(function_exists ('finfo_open') and !empty($intersection))
+		{
+				$exts = array();
+			
+				foreach($intersection as $in)
+				{
+					if(is_array($in))
+					{
+						$exts = array_merge($exts, $in);
+					}
+					else
+					{
+						$exts[] = $in;
+					}
+				}
+				
+				$finfo = finfo_open(FILEINFO_MIME_TYPE);
+				$file_type = finfo_file($finfo, $file['tmp_name']);
+				
+		}
+		else
+		{
+			//get file ext
+			$file_type	= strtolower(strrchr($file['name'], '.'));
+			$file_type	= substr($file_type,1);			
+		}
+
+		if ( ! in_array($file_type, $exts))
 		{
 			return FALSE;
 		}
@@ -697,9 +728,20 @@ class MY_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	bool
 	 */
-	function valid_hour($hour)
+	function valid_hour($hour, $type)
 	{
-		if (preg_match("/(2[0-3]|[01][0-9]):[0-5][0-9]/", $hour))
+		if(substr_count($hour, ':') >= 2)
+		{
+			$has_seconds = TRUE;
+		}
+		else
+		{
+			$has_seconds = FALSE;
+		}
+		
+		$pattern = "/^".(($type == '24H')?"([1-2][0-3]|[01]?[1-9])":"(1[0-2]|0?[1-9])").":([0-5]?[0-9])".(($has_seconds)?":([0-5]?[0-9])":"").(($type == '24H')?'':'( AM| PM| am| pm)')."$/";
+	 
+		if (preg_match($pattern, $hour))
 		{
 			return TRUE;
 		}
