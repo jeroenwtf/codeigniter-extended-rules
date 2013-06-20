@@ -1,6 +1,6 @@
 <?php
 
-$lang['file_required']  		= "The field %s is required.";
+$lang['file_required']			= "The field %s is required.";
 $lang['file_size_max']			= "The file uploaded in %s is too big (max size is %s).";
 $lang['file_size_min']			= "The file uploaded in %s is too small (min size is %s).";
 $lang['file_allowed_type']		= "The file uploaded in %s should be %s.";
@@ -17,8 +17,7 @@ $lang['error_partial_upload']			= "The file it's only partially uploaded.";
 $lang['error_temp_dir']					= "Temp dir error.";
 $lang['error_disk_write']				= "Disk write error.";
 $lang['error_stopped']					= "File upload stopped by extension";
-$lang['error']							= "Unexpected file upload error. Error: %s";
-
+$lang['error_unexpected']				= "Unexpected file upload error. Error: %s";
 
 /* End of file form_validation_lang.php */
 /* Location: ./system/language/spanish/form_validation_lang.php */

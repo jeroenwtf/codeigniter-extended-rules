@@ -36,6 +36,11 @@ Use them as the other rules.
 
 ## Change Log
 
+### 3.2
+* Changed `valid_hour`rule to accept 24 and 12 hour format
+* Changed `file_allowed_type` and `file_disallowed_type` to use Mime type when possible instead of extension file.
+* Added more spanish and english translations.
+
 ### 3.1
 * Add `valid_hour`rule.
 
