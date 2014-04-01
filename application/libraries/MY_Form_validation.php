@@ -45,6 +45,8 @@
  * 
  * Change Log
  * ---------------------------------------------------------------------------------------------
+ * 4.1:
+ *  Now the error field message shows all the error messages that it has and not only the first one.
  * 4.0:
  *  Where there is a file upload, now file_required and required force the user to upload a file.
  *  Added image icon mimes.
@@ -297,11 +299,9 @@ class MY_Form_validation extends CI_Form_validation {
 
 					// Save the error message
 					$this->_field_data[$row['field']]['error'] = $message;
+
+					$this->_error_array[$row['field']] = $message;
 					
-					if ( ! isset($this->_error_array[$row['field']]))
-					{
-						$this->_error_array[$row['field']] = $message;
-					}
 					
 					return;
 				}				
@@ -737,6 +737,73 @@ class MY_Form_validation extends CI_Form_validation {
 			return TRUE;
 		}
 	}
+
+
+
+    /**
+     * Error String
+     *
+     * Returns the error messages as a string, wrapped in the error delimiters
+     *
+     * @param   string
+     * @param   string
+     * @return  string
+     */
+    public function error_string($prefix = '', $suffix = '')
+    {
+        // No errors, validation passes!
+        if (count($this->_error_array) === 0)
+        {
+            return '';
+        }
+
+        if ($prefix === '')
+        {
+            $prefix = $this->_error_prefix;
+        }
+
+        if ($suffix === '')
+        {
+            $suffix = $this->_error_suffix;
+        }
+
+        // Generate the error string
+        $str = '';
+        foreach ($this->_error_array as $val)
+        {
+            if ($val !== '')
+            {
+                //if field has more than one error, then all will be listed
+                if(is_array($val))
+                {
+                   foreach($val as $v)
+                   {
+                        $str .= $prefix.$v.$suffix."\n";
+                   }
+                }
+                else
+                {
+                     $str .= $prefix.$val.$suffix."\n";
+                }
+
+            }
+        }
+
+        return $str;
+    }
+
+
+    public function wysiwyg_strip_tags($str)
+    {
+	    return strip_tags($str, '<strong><b><p><ul><ol><li><a><span>');
+    }
+
+
+
+
+
+
+
 	
 	// --------------------------------------------------------------------
 
