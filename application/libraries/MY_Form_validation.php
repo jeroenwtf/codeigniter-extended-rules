@@ -45,8 +45,6 @@
  * 
  * Change Log
  * ---------------------------------------------------------------------------------------------
- * 4.1:
- *  Now the error field message shows all the error messages that it has and not only the first one.
  * 4.0:
  *  Where there is a file upload, now file_required and required force the user to upload a file.
  *  Added image icon mimes.
@@ -300,7 +298,7 @@ class MY_Form_validation extends CI_Form_validation {
 					// Save the error message
 					$this->_field_data[$row['field']]['error'] = $message;
 
-					$this->_error_array[$row['field']] = $message;
+					$this->_error_array[$row['field']][] = $message;
 					
 					
 					return;
