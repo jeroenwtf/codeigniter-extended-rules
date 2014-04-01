@@ -30,6 +30,8 @@
  * is_exactly[list]				Check if the field's value is in the list (separated by comas).
  * is_not[list]					Check if the field's value is not permitted (separated by comas).
  * valid_hour[hour]				Check if the field's value is a valid 24 hour.
+ * valid_date[format]				Check if the field's value has a valid date format.
+ * valid_range_date[format]			Check if the field's value has a valid range of two date
  * 
  * 
  * Info
@@ -43,6 +45,13 @@
  * 
  * Change Log
  * ---------------------------------------------------------------------------------------------
+ * 4.0:
+ *  Where there is a file upload, now file_required and required force the user to upload a file.
+ *  Added image icon mimes.
+ *  Added valid_date method that checks if a field has a valid date format.
+ *  Added valid_range_date method that checks if a field has a valid range of two dates.
+ * 3.2:
+ *  Bug fixes
  * 3.1:
  *  Added 'valid_hour'
  * 3.0:
@@ -57,6 +66,8 @@
 
 class MY_Form_validation extends CI_Form_validation {
 
+	private  $_standar_date_format = 'Y-m-d H:i:s';
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -131,6 +142,13 @@ class MY_Form_validation extends CI_Form_validation {
 			log_message('DEBUG','processing as a file');
 			$postdata = $_FILES[$row['field']];
 			
+			//required bug
+			//if some stupid like me never remember that it's file_required and not required
+			//this will save a lot of var_dumping time.
+			if(in_array('required', $rules))
+			{
+				$rules[array_search('required', $rules)] = 'file_required';
+			}
 			//before doing anything check for errors
 		  if($postdata['error'] !== UPLOAD_ERR_OK)
 			{
@@ -401,6 +419,7 @@ class MY_Form_validation extends CI_Form_validation {
 		//is type a group type? image, application, word_document, code, zip .... -> load proper array
 		$ext_groups						= array();
 		$ext_groups['image']			= array('jpg', 'jpeg', 'gif', 'png');
+		$ext_groups['image_icon']		= array('jpg', 'jpeg', 'gif', 'png', 'ico', 'image/x-icon');
 		$ext_groups['application']		= array('exe', 'dll', 'so', 'cgi');
 		$ext_groups['php_code']			= array('php', 'php4', 'php5', 'inc', 'phtml');
 		$ext_groups['word_document']	= array('rtf', 'doc', 'docx');
@@ -751,8 +770,84 @@ class MY_Form_validation extends CI_Form_validation {
 		}
 	}
 	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if the field's value has a valid date format, if not provided,
+	 * it will use the $_standar_date_format value
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	bool
+	 */	
+	 
+	public function valid_date($str, $format = NULL)
+	{
+		if(is_null($format))
+		{
+			$format = $this->_standar_date_format;
+		}
+	
+		$parsed = date_parse_from_format($format, $str);
+		if($parsed['warning_count'] > 0 or $parsed['error_count'] > 0)
+		{
+			return FALSE;
+		}
+		return TRUE;
+	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if the field's value has a valid range of two date format, if not provided,
+	 * it will use the $_standar_date_format value
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	bool
+	 */	
+	 
+	public function valid_range_date($str, $format = NULL)
+	{
+		if(is_null($format))
+		{
+			$format = $this->_standar_date_format;
+		}
+		//Anonymous functions, bitch!!!
+		$exploded = array_reduce(explode('-', $str), function($return, $val)
+															{
+																$return[] = trim($val);
+																return $return;
+															});
+
+		if (count($exploded) != 2)
+		{
+			return FALSE;
+		}
+		$dates = array();
+		$valid_dates = TRUE;
+		foreach($exploded as $e)
+		{
+			$parsed = date_parse_from_format($format, $e);
+			$dates[] = $parsed;
+			if($parsed['warning_count'] > 0 or $parsed['error_count'] > 0)
+			{
+				$valid_dates = FALSE;
+			}
+		}
+		if($valid_dates == FALSE)
+		{
+			return FALSE;
+		}
+		//why use strtotime when you can get hardcore!
+		if (mktime($dates[0]['hour'], $dates[0]['minute'], $dates[0]['second'],  $dates[0]['month'], $dates[0]['day'], $dates[0]['year'] ) >
+			mktime($dates[1]['hour'], $dates[1]['minute'], $dates[1]['second'],  $dates[1]['month'], $dates[1]['day'], $dates[1]['year'] )
+		)
+		{
+			return FALSE;
+		}
+		return TRUE;
+	}
 }
-
-
 /* End of file MY_form_validation.php */
 /* Location: ./application/libraries/MY_form_validation.php */
