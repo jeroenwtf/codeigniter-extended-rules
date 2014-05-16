@@ -1,4 +1,4 @@
-# CodeIgniter extended rules
+﻿# CodeIgniter extended rules
 
 A set of useful form validation rules, focused on file uploading (and some more). English corrections and other languages are welcome.
 
@@ -32,6 +32,10 @@ Use them as the other rules.
 * `file_image_exactdim[x,y]` Returns FALSE if the image is not the given dimension.
 * `is_exactly[list]` Check if the field's value is in the list.
 * `is_not[list]` Check if the field's value is not permitted.
+* `valid_hour[type]` Check if the field's value is a valid hour.
+* `valid_date[date_format]` Check if the field's value has a valid format. If not provided with a format, it will use the standard value..
+* `valid_range_date[date_format]` Check if the field's value has a valid range of two date formats. If not provided with a format, it will use the standard value..
+
 
 
 ## Change Log
