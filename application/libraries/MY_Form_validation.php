@@ -379,7 +379,7 @@ class MY_Form_validation extends CI_Form_validation {
 	 */
 	function file_size_min($file,$min_size)
 	{
-		$max_size_bit	= $this->let_to_bit($max_size);
+		$min_size_bit	= $this->let_to_bit($min_size);
 		if ($file['size'] < $min_size_bit)
 		{
 			return FALSE;
