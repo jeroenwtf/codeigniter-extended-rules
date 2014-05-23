@@ -18,6 +18,31 @@ $lang['error_temp_dir']					= "Error del directorio temporal.";
 $lang['error_disk_write']				= "Error de escritura en disco.";
 $lang['error_stopped']					= "Subida del archivo detenida por extensión.";
 $lang['error_unexpected']				= "Error inesperado de subida de archivo. Error: %s";
+$lang['valid_date']						= "El campo %s ha de contener una fecha válida.";
+$lang['valid_range_date']				= "El campo %s ha de contener dos fechas válidas.";
+$lang['required']						= "El valor %s es obligatorio.";
+$lang['isset']							= "El campo %s debe contener un valor.";
+$lang['valid_email']					= "El campo %s debe contener una direccion de mail correcta.";
+$lang['valid_emails']					= "El campo %s debe contener una lista valida de mails.";
+$lang['valid_url']						= "El campo %s debe contener una URL valida";
+$lang['valid_ip']						= "El campo %s debe contener una IP valida.";
+$lang['min_length']						= "El campo %s debe contener al menos %s caracteres.";
+$lang['max_length']						= "El campo %s no puede exceder %s caracteres.";
+$lang['exact_length']					= "El campo %s debe contener la cantidad exacta de %s caracteres.";
+$lang['alpha']							= "El campo %s sólo debe contener caracteres alfabeticos, sin espacios, símbolos o números.";
+$lang['alpha_numeric']					= "El campo %s sólo debe contener numeros y letras, sin símbolos.";
+$lang['alpha_dash']						= "El campo %s sólo contiene numeros, letras y guiones alto y bajo.";
+$lang['numeric']						= "El campo %s sólo puede contener números.";
+$lang['is_numeric']						= "El campo %s sólo puede contener caracteres numéricos.";
+$lang['integer']						= "El campo %s sólo puede contener numeros tipo INTEGER (enteros)";
+$lang['regex_match']					= "El campo %s no contiene el formato correcto";
+$lang['matches']						= "El campo %s no coincide con su parámetro %s.";
+$lang['is_unique'] 						= "El campo %s es un valor que ya existe en la Base de Datos.";
+$lang['is_natural']						= "El campo %s sólo puede contener numeros naturales.";
+$lang['is_natural_no_zero']				= "El campo %s sólo puede contener valores superiores a cero.";
+$lang['decimal']						= "El campo %s sólo puede contener valores decimales.";
+$lang['less_than']						= "El campo %s sólo puede contener valores superiores a %s.";
+$lang['greater_than']					= "El campo %s sólo puede contener valores mayores a %s.";
 
 /* End of file form_validation_lang.php */
 /* Location: ./system/language/spanish/form_validation_lang.php */
