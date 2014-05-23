@@ -29,7 +29,7 @@
  * file_image_exactdim[x,y]		Returns FALSE if the image is not the given dimension.
  * is_exactly[list]				Check if the field's value is in the list (separated by comas).
  * is_not[list]					Check if the field's value is not permitted (separated by comas).
- * valid_hour[hour]				Check if the field's value is a valid 24 hour.
+ * valid_hour[hour]				Check if the field's value is a valid 24 hour. [24H or 12H]
  * valid_date[format]				Check if the field's value has a valid date format.
  * valid_range_date[format]			Check if the field's value has a valid range of two date
  * 
@@ -68,7 +68,8 @@
 
 class MY_Form_validation extends CI_Form_validation {
 
-	private  $_standar_date_format = 'Y-m-d H:i:s';
+	private  $_standard_date_format = 'Y-m-d H:i:s';
+	private  $mime_types;
 	
 	public function __construct()
 	{
@@ -111,7 +112,7 @@ class MY_Form_validation extends CI_Form_validation {
 		return $rc;
 	}
 
-	function file_upload_error_message($error_code)
+	function file_upload_error_message($field, $error_code)
 	{
 		switch ($error_code)
 		{
@@ -122,7 +123,8 @@ class MY_Form_validation extends CI_Form_validation {
 			case UPLOAD_ERR_PARTIAL:
 				return $this->CI->lang->line('error_partial_upload');
 			case UPLOAD_ERR_NO_FILE:
-				return $this->CI->lang->line('error_partial_upload');
+				$line = $this->CI->lang->line('file_required');
+				return sprintf($line, $this->_translate_fieldname($field));
 			case UPLOAD_ERR_NO_TMP_DIR:
 				return $this->CI->lang->line('error_temp_dir');
 			case UPLOAD_ERR_CANT_WRITE:
@@ -136,6 +138,7 @@ class MY_Form_validation extends CI_Form_validation {
 	
 	function _execute($row, $rules, $postdata = NULL, $cycles = 0)
 	{
+
 		log_message('DEBUG','called MY_form_validation::_execute ' . $row['field']);
 		//changed based on
 		//http://codeigniter.com/forums/viewthread/123816/P10/#619868
@@ -157,12 +160,12 @@ class MY_Form_validation extends CI_Form_validation {
 				//If the error it's 4 (ERR_NO_FILE) and the file required it's deactivated don't call an error
 				if($postdata['error'] != UPLOAD_ERR_NO_FILE)
 				{
-					  $this->_error_array[$row['field']] = $this->file_upload_error_message($postdata['error']);
+					  $this->_error_array[$row['field']] = $this->file_upload_error_message($row['label'], $postdata['error']);
 					  return FALSE;
 				}
 				elseif($postdata['error'] == UPLOAD_ERR_NO_FILE and in_array('file_required', $rules))
 				{
-					  $this->_error_array[$row['field']] = $this->file_upload_error_message($postdata['error']);
+					  $this->_error_array[$row['field']] = $this->file_upload_error_message($row['label'], $postdata['error']);
 					  return FALSE;
 				}
 			}
@@ -387,6 +390,26 @@ class MY_Form_validation extends CI_Form_validation {
 		return TRUE;
 	}
 	
+	// ----------------------
+	
+	function load_mimes()
+	{
+		// Get mime types for later
+		if (defined('ENVIRONMENT') AND file_exists(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+		{
+		    include APPPATH.'config/'.ENVIRONMENT.'/mimes.php';
+		}
+		else
+		{
+			include APPPATH.'config/mimes.php';
+		}
+		
+		$this->mime_types = $mimes;
+
+	}
+	
+	
+	
 	// --------------------------------------------------------------------
 
 	/**
@@ -432,8 +455,11 @@ class MY_Form_validation extends CI_Form_validation {
 			$exts	= $ext_groups[$exts[0]];
 		}
 		
+		$this->load_mimes();
+		
+		
 		$exts_types = array_flip($exts);
-		$intersection = array_intersect_key($this->CI->output->mimes, $exts_types);
+		$intersection = array_intersect_key($this->mime_types, $exts_types);
 		
 		//if we can use the finfo function to check the mime AND the mime
 		//exists in the mime file of codeigniter...
@@ -461,7 +487,7 @@ class MY_Form_validation extends CI_Form_validation {
 		{
 			//get file ext
 			$file_type	= strtolower(strrchr($file['name'], '.'));
-			$file_type	= substr($file_type,1);			
+			$file_type	= substr($file_type,1);
 		}
 
 		if ( ! in_array($file_type, $exts))
@@ -837,11 +863,90 @@ class MY_Form_validation extends CI_Form_validation {
 		}
 	}
 	
+	
+		// Function that simulates a date_parse_from_format for PHP versions 5.2 or lower.
+		// snippet of code thanks to http://stackoverflow.com/questions/6668223/php-date-parse-from-format-alternative-in-php-5-2
+		// thanks to Jeremy: http://stackoverflow.com/users/1955094/jeremy
+		// thanks to Rudie: http://stackoverflow.com/users/247372/rudie
+		
+	  private function _date_parse_from_format($format, $date) 
+	  {
+	        // reverse engineer date formats
+	        $keys = array(
+	            'Y' => array('year', '\d{4}'),              
+	            'y' => array('year', '\d{2}'),              
+	            'm' => array('month', '\d{2}'),             
+	            'n' => array('month', '\d{1,2}'),           
+	            'M' => array('month', '[A-Z][a-z]{3}'),     
+	            'F' => array('month', '[A-Z][a-z]{2,8}'),   
+	            'd' => array('day', '\d{2}'),
+	            'j' => array('day', '\d{1,2}'),  
+	            'D' => array('day', '[A-Z][a-z]{2}'), 
+	            'l' => array('day', '[A-Z][a-z]{6,9}'), 
+	            'u' => array('hour', '\d{1,6}'),            
+	            'h' => array('hour', '\d{2}'), 
+	            'H' => array('hour', '\d{2}'),   
+	            'g' => array('hour', '\d{1,2}'),  
+	            'G' => array('hour', '\d{1,2}'),     
+	            'i' => array('minute', '\d{2}'), 
+	            's' => array('second', '\d{2}')
+	        );
+	
+	        // convert format string to regex
+	        $regex = '';
+	        $chars = str_split($format);
+	        foreach ( $chars AS $n => $char ) {
+	            $lastChar = isset($chars[$n-1]) ? $chars[$n-1] : '';
+	            $skipCurrent = '\\' == $lastChar;
+	            if ( !$skipCurrent && isset($keys[$char]) ) {
+	                $regex .= '(?P<'.$keys[$char][0].'>'.$keys[$char][1].')';
+	            }
+	            else if ( '\\' == $char ) {
+	                $regex .= $char;
+	            }
+	            else {
+	                $regex .= preg_quote($char);
+	            }
+	        }
+	
+	        $dt = array();
+
+	        // now try to match it
+	        if( preg_match('#^'.$regex.'$#', $date, $dt) ){
+	            foreach ( $dt AS $k => $v ){
+	                if ( is_int($k) ){
+	                    unset($dt[$k]);
+	                }
+	            }
+	            if( !checkdate($dt['month'], $dt['day'], $dt['year']) ){
+	                $dt['error_count'] = 1;
+	            }
+				else 
+				{
+				 	$dt['error_count'] = 0;
+				}
+	        }
+	        else {
+	            $dt['error_count'] = 1;
+	        }
+			
+	        $dt['errors'] = array();
+	        $dt['fraction'] = '';
+	        $dt['warning_count'] = 0;
+	        $dt['warnings'] = array();
+	        $dt['is_localtime'] = 0;
+	        $dt['zone_type'] = 0;
+	        $dt['zone'] = 0;
+	        $dt['is_dst'] = '';
+
+	        return $dt;
+	    }
+	
 	// --------------------------------------------------------------------
 
 	/**
 	 * Check if the field's value has a valid date format, if not provided,
-	 * it will use the $_standar_date_format value
+	 * it will use the $_standard_date_format value
 	 *
 	 * @access	public
 	 * @param	string
@@ -850,12 +955,20 @@ class MY_Form_validation extends CI_Form_validation {
 	 
 	public function valid_date($str, $format = NULL)
 	{
-		if(is_null($format))
+		if(is_null($format) or $format === FALSE)
 		{
-			$format = $this->_standar_date_format;
+			$format = $this->_standard_date_format;
 		}
-	
-		$parsed = date_parse_from_format($format, $str);
+
+		if(function_exists ('date_parse_from_format'))
+		{
+			$parsed = date_parse_from_format($format, $str);
+		}
+		else
+		{
+			$parsed = $this->_date_parse_from_format($format, $str);
+		}
+
 		if($parsed['warning_count'] > 0 or $parsed['error_count'] > 0)
 		{
 			return FALSE;
@@ -867,7 +980,7 @@ class MY_Form_validation extends CI_Form_validation {
 
 	/**
 	 * Check if the field's value has a valid range of two date format, if not provided,
-	 * it will use the $_standar_date_format value
+	 * it will use the $_standard_date_format value
 	 *
 	 * @access	public
 	 * @param	string
@@ -876,26 +989,62 @@ class MY_Form_validation extends CI_Form_validation {
 	 
 	public function valid_range_date($str, $format = NULL)
 	{
-		if(is_null($format))
-		{
-			$format = $this->_standar_date_format;
-		}
-		//Anonymous functions, bitch!!!
-		$exploded = array_reduce(explode('-', $str), function($return, $val)
-															{
-																$return[] = trim($val);
-																return $return;
-															});
 
-		if (count($exploded) != 2)
+		if(is_null($format) or $format === FALSE)
 		{
-			return FALSE;
+			$format = $this->_standard_date_format;
 		}
+
+		$separation_char = '-';
+
+		
+		$exploded = explode($separation_char, $str);
+		
+		foreach($exploded as $key => $e)
+		{
+			$exploded[$key] = trim($e);
+		}
+
+		if (count($exploded) > 2)
+		{
+			//in case we are using dates like Y-m-d and separation char is - etc...
+			
+			$sub_exploded = $exploded;
+			$count_rows = count($exploded);
+			
+			$exploded = array();
+			
+			$vector_exploded = array();
+			
+			for ($i=0; $i < ($count_rows / 2); $i++) { 
+				$vector_exploded[] = $sub_exploded[$i];
+			}
+			
+			$exploded[0] = implode($separation_char, $vector_exploded);
+			$vector_exploded = array();
+			
+			for ($i=($count_rows / 2); $i < $count_rows; $i++) { 
+				$vector_exploded[] = $sub_exploded[$i];
+			}
+			
+			$exploded[1] = implode($separation_char, $vector_exploded);
+			
+		}
+
 		$dates = array();
 		$valid_dates = TRUE;
 		foreach($exploded as $e)
 		{
-			$parsed = date_parse_from_format($format, $e);
+			if(function_exists ('date_parse_from_format'))
+			{
+				$parsed = date_parse_from_format($format, $e);
+			}
+			else
+			{
+				$parsed = $this->_date_parse_from_format($format, $e);
+			}
+			
+			
 			$dates[] = $parsed;
 			if($parsed['warning_count'] > 0 or $parsed['error_count'] > 0)
 			{
