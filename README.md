@@ -8,7 +8,10 @@ Original code written by **devbro** (devbro@devbro.com).
 
 ## Requirements
 
-Codeigniter 2.x (version for Codeigniter 3 comming soon!)
+Codeigniter 2.x
+Php 5.2 or above
+
+(Codeigniter 3.x support at: https://github.com/Patroklo/codeigniter3.x-extended-rules)
 
 
 ## Installation
